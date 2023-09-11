@@ -1,3 +1,29 @@
+<script setup>
+import axios from "axios";
+import { onMounted, ref } from "vue";
+
+let invoices = ref([]);
+
+onMounted(async () => {
+  getInvoices();
+});
+
+// const getInvoices = async () => {
+//   let response = await axios.get("/api/get_all_invoice");
+//   console.log("response", response);
+//   invoices.value = response.data.invoices;
+// };
+const getInvoices = async () => {
+  try {
+    const response = await axios.get("/api/get_all_invoice");
+    invoices.value = response.data.invoices; // Update the invoices data
+    console.log("Response", response);
+  } catch (error) {
+    console.error("Error fetching invoices", error);
+  }
+};
+</script>
+
 <template>
   <div class="container">
     <!--==================== INVOICE LIST ====================-->
@@ -56,14 +82,19 @@
         </div>
 
         <!-- item 1 -->
-        <div class="table--items">
-          <a href="#" class="table--items--transactionId">#093654</a>
-          <p>Jan 18, 9:31am</p>
-          <p>#093654</p>
-          <p>Jonathan Yu</p>
-          <p>Jan 18, 9:31am</p>
-          <p>$ 16,943</p>
+        <div v-if="invoices.length > 0">
+          <div class="table--items" v-for="item in invoices" :key="item.id">
+            <a href="#" class="table--items--transactionId"
+              >#{{ item.id ? item.id : "" }}</a
+            >
+            <p>{{ item.date ? item.date : "" }}</p>
+            <p>{{ item.number ? item.number : "" }}</p>
+            <p>{{ item.customer ? item.customer.firstname : "" }}</p>
+            <p>{{ item.due_date ? item.due_date : "" }}</p>
+            <p>$ {{ item.total ? item.total : "" }}</p>
+          </div>
         </div>
+        <div v-else><div class="table--items">Invoice Not Found</div></div>
       </div>
     </div>
   </div>
