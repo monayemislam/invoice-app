@@ -3,24 +3,28 @@ import axios from "axios";
 import { onMounted, ref } from "vue";
 
 let invoices = ref([]);
+let searchInvoice = ref([]);
 
 onMounted(async () => {
   getInvoices();
 });
 
-// const getInvoices = async () => {
-//   let response = await axios.get("/api/get_all_invoice");
-//   console.log("response", response);
-//   invoices.value = response.data.invoices;
-// };
 const getInvoices = async () => {
   try {
     const response = await axios.get("/api/get_all_invoice");
     invoices.value = response.data.invoices; // Update the invoices data
-    console.log("Response", response);
+    // console.log("Response", response);
   } catch (error) {
     console.error("Error fetching invoices", error);
   }
+};
+
+const search = async () => {
+  let response = await axios.get(
+    "/api/search_invoice?s=" + searchInvoice.value
+  );
+  // console.log("response", response.data.invoices);
+  invoices.value = response.data.invoices;
 };
 </script>
 
@@ -68,6 +72,8 @@ const getInvoices = async () => {
               class="table--search--input"
               type="text"
               placeholder="Search invoice"
+              v-model="searchInvoice"
+              v-on:keyup="search()"
             />
           </div>
         </div>
